@@ -1,5 +1,7 @@
 package com.works.metrostation.model;
 
+import com.works.metrostation.enumeration.CardType;
+import com.works.metrostation.enumeration.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +25,9 @@ public class Card{
 
     @Column(nullable = false)
     private Float balance;
+
+    @Enumerated(EnumType.STRING)
+    public CardType cardType;
 
     @Column(nullable = false, unique = true)
     private Long userId;

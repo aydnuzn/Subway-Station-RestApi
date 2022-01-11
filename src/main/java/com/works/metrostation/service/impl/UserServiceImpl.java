@@ -10,9 +10,12 @@ import com.works.metrostation.repository.UserRepository;
 import com.works.metrostation.service.UserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.apache.log4j.Logger;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final Logger LOG = Logger.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -33,15 +36,19 @@ public class UserServiceImpl implements UserService {
                 .password(bCryptPasswordEncoder.encode(userDto.getPassword()))
                 .role(userDto.getRole())
                 .build();
-        return userRepository.save(user);
+        user = userRepository.save(user);
+        LOG.info("User Created");
+        return user;
     }
 
     @Override
     public User getUser(UserDetailsDto userDetailsDto, Long userId){
 
         checkUserPermission(userDetailsDto, userId);
-        return this.userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+        LOG.info("User Fetch Successfully.");
+        return user;
     }
 
     @Override
@@ -53,7 +60,9 @@ public class UserServiceImpl implements UserService {
         user.setUsername(userDto.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
         user.setRole(userDto.getRole());
-        return userRepository.saveAndFlush(user);
+        user = userRepository.saveAndFlush(user);
+        LOG.info("User Updated");
+        return user;
     }
 
     @Override
@@ -62,10 +71,9 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Entity Not Found"));
         userRepository.delete(user);
+        LOG.info("User Deleted");
         return user;
     }
-
-
 
     /*
      * Strict security policy implemented, admin can take all actions and users can only import or modify their own account

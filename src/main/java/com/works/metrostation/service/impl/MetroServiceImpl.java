@@ -5,10 +5,13 @@ import com.works.metrostation.exception.EntityNotFoundException;
 import com.works.metrostation.model.Metro;
 import com.works.metrostation.repository.MetroRepository;
 import com.works.metrostation.service.MetroService;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MetroServiceImpl implements MetroService {
+
+    private static final Logger LOG = Logger.getLogger(MetroServiceImpl.class);
 
     private final MetroRepository metroRepository;
 
@@ -24,14 +27,19 @@ public class MetroServiceImpl implements MetroService {
                 .numberOfSeats(metroDto.getNumberOfSeats())
                 .capacity(metroDto.getCapacity())
                 .build();
-        return metroRepository.save(metro);
+
+        metro = metroRepository.save(metro);
+        LOG.info("Metro Created");
+        return metro;
     }
 
     @Override
     public Metro getMetro(Long metroId){
 
-        return this.metroRepository.findById(metroId)
+        Metro metro = metroRepository.findById(metroId)
                 .orElseThrow(() -> new EntityNotFoundException("Metro not found"));
+        LOG.info("Metro info Retrieved Successfully");
+        return metro;
     }
 
     @Override
@@ -42,7 +50,10 @@ public class MetroServiceImpl implements MetroService {
         metro.setNumberOfDoors(metroDto.getNumberOfDoors());
         metro.setNumberOfSeats(metroDto.getNumberOfSeats());
         metro.setCapacity(metroDto.getCapacity());
-        return metroRepository.saveAndFlush(metro);
+
+        metro = metroRepository.saveAndFlush(metro);
+        LOG.info("Metro Updated");
+        return metro;
     }
 
     @Override
@@ -50,7 +61,9 @@ public class MetroServiceImpl implements MetroService {
 
         Metro metro = metroRepository.findById(metroId)
                 .orElseThrow(() -> new EntityNotFoundException("Metro Not Found"));
+
         metroRepository.delete(metro);
+        LOG.info("Metro Deleted");
         return metro;
     }
 

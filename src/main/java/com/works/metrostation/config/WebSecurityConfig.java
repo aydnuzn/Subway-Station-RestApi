@@ -69,6 +69,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/boarding").hasAuthority("PASSANGER")
 
                 /*
+                 * VoyageController authorization & authority configuration
+                 */
+                .antMatchers(HttpMethod.POST, "/voyages").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.GET, "/voyages/**").hasAnyAuthority("ADMIN","PASSANGER")
+
+                /*
                  * Common security configurations
                  * Since it is an example application, basic auth is used for simplicity. (JWT or OAuth2 not implemented)
                  */

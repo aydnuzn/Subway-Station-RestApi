@@ -1,5 +1,7 @@
 package com.works.metrostation.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import net.minidev.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
@@ -11,6 +13,7 @@ import org.apache.log4j.spi.ThrowableInformation;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -32,6 +35,7 @@ public class JSONEventLayout extends Layout {
     private static Integer version = 1;
 
     private JSONObject logstashEvent;
+    private Map<String,Object> logstashEventMap;
 
     public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     public static final FastDateFormat ISO_DATETIME_TIME_ZONE_FORMAT_WITH_MILLIS = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", UTC);
@@ -64,6 +68,7 @@ public class JSONEventLayout extends Layout {
         }
     }
 
+    @SneakyThrows
     public String format(LoggingEvent loggingEvent) {
         threadName = loggingEvent.getThreadName();
         timestamp = loggingEvent.getTimeStamp();
@@ -71,21 +76,34 @@ public class JSONEventLayout extends Layout {
         mdc = loggingEvent.getProperties();
         ndc = loggingEvent.getNDC();
 
-        logstashEvent = new JSONObject();
-        String whoami = this.getClass().getSimpleName();
+    //    logstashEvent = new JSONObject();
+        logstashEventMap = new LinkedHashMap<>();
 
-        logstashEvent.put("ip_address", FilterConfig.IP_ADDRESS);
-        logstashEvent.put("session_id", FilterConfig.SESSION_ID);
-        logstashEvent.put("url_address", FilterConfig.URL_ADDRESS);
-        logstashEvent.put("user_agent", FilterConfig.USER_AGENT);
+        String whoami = this.getClass().getSimpleName();
 
         /**
          * All v1 of the event format requires is
          * "@timestamp" and "@version"
          * Every other field is arbitrary
          */
-        logstashEvent.put("@version", version);
-        logstashEvent.put("@timestamp", dateFormat(timestamp));
+        addEventData("@version", version);
+        addEventData("@timestamp", dateFormat(timestamp));
+
+        addEventData("level", loggingEvent.getLevel().toString());
+        logstashEventMap.put("message", loggingEvent.getRenderedMessage());
+
+        if (locationInfo) {
+            info = loggingEvent.getLocationInformation();
+            addEventData("file", info.getFileName());
+            addEventData("line_number", info.getLineNumber());
+            addEventData("class", info.getClassName());
+            addEventData("method", info.getMethodName());
+        }
+
+        addEventData("url_address", FilterConfig.URL_ADDRESS);
+        addEventData("ip_address", FilterConfig.IP_ADDRESS);
+        addEventData("session_id", FilterConfig.SESSION_ID);
+        addEventData("user_agent", FilterConfig.USER_AGENT);
 
         /**
          * Extract and add fields from log4j config, if defined
@@ -112,8 +130,7 @@ public class JSONEventLayout extends Layout {
         /**
          * Now we start injecting our own stuff.
          */
-        logstashEvent.put("source_host", hostName);
-        logstashEvent.put("message", loggingEvent.getRenderedMessage());
+        logstashEventMap.put("source_host", hostName);
 
         if (loggingEvent.getThrowableInformation() != null) {
             final ThrowableInformation throwableInformation = loggingEvent.getThrowableInformation();
@@ -130,21 +147,14 @@ public class JSONEventLayout extends Layout {
             addEventData("exception", exceptionInformation);
         }
 
-        if (locationInfo) {
-            info = loggingEvent.getLocationInformation();
-            addEventData("file", info.getFileName());
-            addEventData("line_number", info.getLineNumber());
-            addEventData("class", info.getClassName());
-            addEventData("method", info.getMethodName());
-        }
-
         addEventData("logger_name", loggingEvent.getLoggerName());
         addEventData("mdc", mdc);
         addEventData("ndc", ndc);
-        addEventData("level", loggingEvent.getLevel().toString());
         addEventData("thread_name", threadName);
 
-        return logstashEvent.toString() + "\n";
+        String resultJSON = new ObjectMapper().writeValueAsString(logstashEventMap);
+        return resultJSON + "\n";
+        //return logstashEvent.toString() + "\n";
     }
 
     public boolean ignoresThrowable() {
@@ -192,7 +202,7 @@ public class JSONEventLayout extends Layout {
 
     private void addEventData(String keyname, Object keyval) {
         if (null != keyval) {
-            logstashEvent.put(keyname, keyval);
+            logstashEventMap.put(keyname, keyval);
         }
     }
 

@@ -11,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,14 +24,14 @@ public class UserDetailsServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    User RECORD_1 = new User(1L,"yolcu@mail.com", "123456", UserRole.PASSANGER);
+    User RECORD_USER = new User(1L,"passanger@mail.com", "123456", UserRole.PASSANGER);
 
     @Test
     public void loadUserByUsername_success() throws Exception {
-        Mockito.when(userRepository.findTopByUsername(RECORD_1.getUsername()))
-                .thenReturn(Optional.of(RECORD_1));
+        Mockito.when(userRepository.findTopByUsername(RECORD_USER.getUsername()))
+                .thenReturn(Optional.of(RECORD_USER));
 
-        assertEquals(userDetailSerciveImpl.loadUserByUsername(RECORD_1.getUsername()), new UserDetailsDto(RECORD_1));
+        assertEquals(userDetailSerciveImpl.loadUserByUsername(RECORD_USER.getUsername()), new UserDetailsDto(RECORD_USER));
     }
 
 }

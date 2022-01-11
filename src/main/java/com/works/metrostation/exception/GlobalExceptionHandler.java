@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.xml.ws.Response;
 import java.util.*;
 
 @RestControllerAdvice
@@ -87,19 +89,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<ErrorObject>(message, HttpStatus.FORBIDDEN);
     }
 
-/*
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorObject> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
-        BindingResult bindingResult = ex.getBindingResult();
-        ErrorObject message = new ErrorObject(
-                HttpStatus.BAD_REQUEST.value(),
-                new Date(),
-                ex.getMessage(),
-                request.getDescription(false));
-        LOG.error(ex.getMessage());
-        return new ResponseEntity<ErrorObject>(message, HttpStatus.BAD_REQUEST);
-    }
-*/
     @ExceptionHandler(CardAlreadyExistsException.class)
     public ResponseEntity<ErrorObject> cardAlreadyExistsException(CardAlreadyExistsException ex, WebRequest request) {
         ErrorObject message = new ErrorObject(
@@ -132,29 +121,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<ApiError>(message, HttpStatus.BAD_REQUEST);
     }
 
-    /*
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-        List<String> errors = new ArrayList<String>();
-        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.add(error.getField() + ": " + error.getDefaultMessage());
-        }
-        for (ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-            errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
-        }
-
-        ApiError apiError = new ApiError(
-                HttpStatus.BAD_REQUEST.value(),
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorObject> handleUnprosseasableMsgException(HttpMessageNotReadableException ex, WebRequest request){
+        ErrorObject message = new ErrorObject(
+                HttpStatus.UNPROCESSABLE_ENTITY.value(),
                 new Date(),
-                ex.getMessage(),
-                request.getDescription(false),
-                errors);
-
-        return handleExceptionInternal(ex, apiError, headers, HttpStatus.valueOf(apiError.getStatusCode()), request);
+                "Unprocessable Input Data",
+                request.getDescription(false));
+        LOG.error("Unprocessable Input Data");
+        return new ResponseEntity<ErrorObject>(message, HttpStatus.UNPROCESSABLE_ENTITY);
     }
-     */
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorObject> globalExceptionHandler(Exception ex, WebRequest request) {

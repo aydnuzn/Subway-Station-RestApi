@@ -3,6 +3,7 @@ package com.works.metrostation.service;
 import com.works.metrostation.dto.CardDto;
 import com.works.metrostation.dto.CardMoneyDto;
 import com.works.metrostation.dto.UserDetailsDto;
+import com.works.metrostation.enumeration.CardType;
 import com.works.metrostation.enumeration.UserRole;
 import com.works.metrostation.model.Card;
 import com.works.metrostation.model.User;
@@ -35,10 +36,10 @@ public class CardServiceTest {
     User RECORD_USER1 = new User(1L,"admin@mail.com", "123456", UserRole.ADMIN);
     User RECORD_USER2 = new User(2L,"yolcu@mail.com", "123456",UserRole.PASSANGER);
 
-    Card RECORD_CARD = new Card(1L, "11223344", 0F, 2L);
+    Card RECORD_CARD = new Card(1L, "11223344", 0F, CardType.STANDARD, 2L);
 
     @Test
-    public void getCardById_success() throws Exception{
+    public void getCardByNumber_success() throws Exception{
 
         UserDetailsDto userDetailsDto = new UserDetailsDto(RECORD_USER1);
 
@@ -49,9 +50,9 @@ public class CardServiceTest {
     }
 
     @Test
-    public void createCardById_sucess() throws Exception{
+    public void createCardByNumber_success() throws Exception{
 
-        CardDto cardDto = new CardDto(RECORD_CARD.getCardNumber(), RECORD_CARD.getUserId());
+        CardDto cardDto = new CardDto(RECORD_CARD.getCardNumber(), RECORD_CARD.getCardType(), RECORD_CARD.getUserId());
 
         Mockito.when(userRepository.findById(RECORD_CARD.getUserId()))
                 .thenReturn(Optional.of(RECORD_USER2));
@@ -65,7 +66,7 @@ public class CardServiceTest {
     }
 
     @Test
-    public void deleteCardById_success() throws Exception{
+    public void deleteCardByNumber_success() throws Exception{
 
         Mockito.when(cardRepository.findByCardNumberEquals(RECORD_CARD.getCardNumber()))
                 .thenReturn(Optional.of(RECORD_CARD));

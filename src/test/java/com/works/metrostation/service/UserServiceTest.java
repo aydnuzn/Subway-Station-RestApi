@@ -13,10 +13,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {

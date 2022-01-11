@@ -2,7 +2,6 @@ package com.works.metrostation.service;
 
 import com.works.metrostation.dto.MetroDto;
 import com.works.metrostation.model.Metro;
-import com.works.metrostation.model.User;
 import com.works.metrostation.repository.MetroRepository;
 import com.works.metrostation.service.impl.MetroServiceImpl;
 import org.junit.jupiter.api.Test;

@@ -22,8 +22,8 @@ public class MetroController {
         this.metroService = metroService;
     }
 
-    @PostMapping()
-    private Metro createMetro(@RequestBody MetroDto metroDto){
+    @PostMapping
+    private Metro createMetro(@RequestBody @Valid MetroDto metroDto){
         return metroService.createMetro(metroDto);
     }
 

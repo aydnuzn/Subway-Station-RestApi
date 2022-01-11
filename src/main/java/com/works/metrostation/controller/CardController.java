@@ -25,25 +25,21 @@ public class CardController {
         this.cardService = cardService;
     }
 
-    // Only Admin
-    @PostMapping()
+    @PostMapping
     private Card createCard(@RequestBody @Valid CardDto cardDto){
         return cardService.createCard(cardDto);
     }
 
-    // Admin ve Kullanıcının kendisi bakabilir.
     @GetMapping("/{cardNumber}")
     private Card getCard(@AuthenticationPrincipal UserDetailsDto userDetailsDto, @PathVariable String cardNumber){
         return cardService.getCard(userDetailsDto, cardNumber);
     }
 
-    // permitAll
-    @PutMapping()
+    @PutMapping
     private Card loadingMoneyOnCard(@RequestBody CardMoneyDto cardMoneyDto){
         return cardService.loadingMoneyOnCard(cardMoneyDto);
     }
 
-    // sadece admin silebilsin
     @DeleteMapping(value = "/{cardNumber}", consumes = MediaType.ALL_VALUE)
     private Card deleteCard(@PathVariable String cardNumber){
         return cardService.deleteCard(cardNumber);

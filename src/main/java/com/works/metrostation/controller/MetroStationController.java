@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(
+        value = "/boarding",
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
 public class MetroStationController {
@@ -19,7 +20,7 @@ public class MetroStationController {
         this.metroStationService = metroStationService;
     }
 
-    @PostMapping("/boarding")
+    @PostMapping
     private BoardingResponseDto entranceToSubway(@AuthenticationPrincipal UserDetailsDto userDetailsDto){
         return metroStationService.entranceToSubway(userDetailsDto);
     }

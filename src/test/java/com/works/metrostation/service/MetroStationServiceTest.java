@@ -2,6 +2,7 @@ package com.works.metrostation.service;
 
 import com.works.metrostation.dto.BoardingResponseDto;
 import com.works.metrostation.dto.UserDetailsDto;
+import com.works.metrostation.enumeration.CardType;
 import com.works.metrostation.enumeration.UserRole;
 import com.works.metrostation.model.Card;
 import com.works.metrostation.model.User;
@@ -32,7 +33,7 @@ public class MetroStationServiceTest {
 
     User RECORD_USER = new User(2L,"yolcu@mail.com", "123456",UserRole.PASSANGER);
 
-    Card RECORD_CARD = new Card(1L, "11223344", 5F, 2L);
+    Card RECORD_CARD = new Card(1L, "11223344", 5F, CardType.STANDARD ,2L);
 
     @Test
     public void entranceToSubway_success() throws Exception{
@@ -44,8 +45,8 @@ public class MetroStationServiceTest {
         Mockito.when(cardRepository.findByUserIdEquals(userDetailsDto.getUser().getId()))
                 .thenReturn(Optional.of(RECORD_CARD));
 
-        Card card = new Card(1L, "11223344", 5F, 2L);
-        card.setBalance(card.getBalance() - 3.5F);
+        Card card = new Card(1L, "11223344", 5F, CardType.STANDARD,2L);
+        card.setBalance(card.getBalance() - card.getCardType().getPrice());
 
         Mockito.when(cardRepository.saveAndFlush(card)).thenReturn(card);
 

@@ -8,6 +8,7 @@ import com.works.metrostation.model.Voyage;
 import com.works.metrostation.repository.MetroRepository;
 import com.works.metrostation.repository.VoyageRepository;
 import com.works.metrostation.service.VoyageService;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
@@ -18,6 +19,8 @@ import java.util.Date;
 
 @Service
 public class VoyageServiceImpl implements VoyageService {
+
+    private static final Logger LOG = Logger.getLogger(VoyageServiceImpl.class);
 
     private final VoyageRepository voyageRepository;
     private final MetroRepository metroRepository;
@@ -43,7 +46,9 @@ public class VoyageServiceImpl implements VoyageService {
                 .metro(metro)
                 .build();
 
-        return voyageRepository.save(voyage);
+        voyage = voyageRepository.save(voyage);
+        LOG.info("Voyage Information Created");
+        return voyage;
     }
 
     @Override
@@ -60,7 +65,7 @@ public class VoyageServiceImpl implements VoyageService {
         clock = Clock.offset(clock, Duration.ofHours(-2));
 
         VoyageDateTimeDto voyageDateTimeDto = new VoyageDateTimeDto(clock, voyage.getMetro().getId());
-
+        LOG.info("The closest voyage information is brought");
         return voyageDateTimeDto;
     }
 
